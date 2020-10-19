@@ -2,13 +2,23 @@
 
 namespace App\Http\Livewire;
 
+use Illuminate\Support\Facades\Http;
 use Livewire\Component;
 
 class SearchList extends Component
 {
-    public $search = "hei man";
+
+    public $search = "";
     public function render()
     {
-        return view('livewire.search-list');
+        $searchResults = [];
+
+        if (strlen($this->search) >= 2){
+            $searchResults = Http::withToken(config('services.tmdb.token'))
+                ->get('https://api.themoviedb.org/3/search/movie?query='.$this->search.'&api_key=403fa9bfe0adc5469716d0ff9f42314c&language=ru')
+                ->json()['results'];
+        }
+
+        return view('livewire.search-list',compact('searchResults'));
     }
 }
